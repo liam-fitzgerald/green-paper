@@ -1,12 +1,13 @@
-\documentclass[twoside]{article}
+\documentclass[twoside]{report}
 
 \usepackage{ustj}
+\usepackage{epigraph}
 
 \addbibresource{mss.bib}
 
-\newcommand{\authorname}{Ernest P. Worrell}
-\newcommand{\authorpatp}{\patp{sampel-palnet}}
-\newcommand{\affiliation}{Kamp Kikakee}
+\newcommand{\authorname}{Liam Fitzgerald}
+\newcommand{\authorpatp}{\patp{hastuc-dibtux}}
+\newcommand{\affiliation}{Urbit Foundation}
 
 %  Make first page footer:
 \fancypagestyle{firststyle}{%
@@ -23,11 +24,11 @@
 %  Arrange subsequent pages:
 \fancyhf{}
 \fancyhead[LE]{{\urbitfont Urbit Systems Technical Journal}}
-\fancyhead[RO]{Floating-Point Arithmetic on Deterministic Systems}
+\fancyhead[RO]{Shrubbery: the greenpaper}
 \fancyfoot[LE,RO]{\thepage}
 
 %%MANUSCRIPT
-\title{Ernest Goes to Mars:  An Enquiry into the Foundations of Artificial Stupidity}
+\title{Shrubbery: the greenpaper}
 \author{\authorname~\authorpatp \\ \affiliation}
 \date{}
 
@@ -37,6 +38,7 @@
 \thispagestyle{firststyle}
 
 \begin{abstract}
+  XX TODO: write abstract
 In this groundbreaking paper, we embark on a cosmic journey with the renowned character Ernest P. Worrell as he ventures into the unexplored realm of Martian computing. Drawing inspiration from Ernest's comically ingenious encounters with everyday challenges, we investigate the foundations of what we term "Artificial Stupidity." As Ernest grapples with Martian technology, we delve into the intricacies of programming errors, algorithmic missteps, and the curious phenomena that arise when human-like intelligence meets extraterrestrial computing systems. Our analysis sheds light on the unexpected intersections between humor, artificial intelligence, and the cosmic absurdity of Martian software. Join us in this interplanetary exploration as we unravel the mysteries of Artificial Stupidity through the lens of Ernest's interstellar escapades.
 \end{abstract}
 
@@ -46,72 +48,150 @@ In this groundbreaking paper, we embark on a cosmic journey with the renowned ch
 
 \tableofcontents
 
-\section{Introduction}
 
+\chapter{Overview}
+
+This article uses 'shrubbery' to refer to the general notion of namespace-maximalist application environments, and 'neo' to refer to the specific implementation by the author that lives as an agent.
+
+There has been a wealth of
 Introduce the scope of your article and investigation.
+
+\chapter{Namespace Maximalism}
+
+\section{Background and Literature}
+The idea of 'namespace maximalism' has precedent in a number of non-urbit contexts.
+
+\section{Internal Discussion}
+
+The original 'Tenets of Namespace Maximalism' \citep{NamespaceTenets} screed is the first attempt to categorically define what 'namespace maximalism' means in an Urbit context. Tenets 0-2 are uncontroversial and are an explication of the internal thinking about the namespace. Tenet 3 appears to contradict the entire idea of 'namespace maximalism', wanting to banish compiled code from the namespace. However, at the time of its writing, Urbit engineering culture had never really grappled in-depth with the notion of overlay namespace, and so the entire idea of ''virtual'' namespaces was not considered. Tenet 4 was a leap at the time, but is no longer a point of contention.
+
+
+The shrubbery models considered in the old shrubbery group \citep{ShrubGroup}, have some interesting characteristics are worth highlighting. Pokes existing in the namespace naturally led to the consensus on shrub implementations being heavily diff-based.
+
+\section{Theory of the Path}
+
+\subsection{Axioms}
+
+Given an arbitrary path $\mathit{foo}$ in a namespace, we can derive a set $\mathit{Ancestors}$ which is simply the set of paths who are prefixes of $\mathit{foo}$. Putting this to the side for now, we can also derive a set $\mathit{Children}$ which is the set of paths for which $\mathit{foo}$ is a prefix.
+
+\paragraph{Axiom 0: Constraint}
+
+A metabinding is code that is designed to constrain the shape of a binding in the namespace. A metabinding constrains both the shape of the noun that the path is bound to, but also the shape of the metabindings permissible underneath it.
+
+\paragraph{Axiom 1: Relocatablity}
+
+A metabinding has a contract with its children. It looks and understands what is beneath its path, but does not (in general) assert anything other than what it is told about ancestor and cousin nodes. This provides arbitrary relocatiblity for metabindings, i.e. they may be installed at any point in the namespace.
+
+\paragraph{Axiom 2: Transactionality}
+
+The conclusion of Axioms 0 and 1 is that a metabinding, when installed at a point in the namespace, defines a "zone of consistency" or a "transactionality boundary". Which is to say, the metabinding is responsible for defining an external interface with which it can be programmed.
+
+\paragraph{Axiom 3: Separation}
+
+We now need to separate the noun from its children. Consider the dataflow graph of the conceptual object bound in the namespace cone. Any mutual recursion should be hoisted to the noun, any variable sized datastructure should be put in the children, and everything else organised in order to minimise the number of dataflow dependencies between siblings or uncles. Anything that possibly needs to be versioned seperately should also be put in the children.
+
+\paragraph{Axiom 4: Identification}
+
+When creating children, the path at which they live is analogous to a primary key, and should be treated as such. Do not use the namespace to provide sorting if that may cause path collisions.
+
+\paragraph{Axiom 5: Canonicity}
+
+For any given datum, there are an arbitrary number of ways to query and store it. A well-behaved namespace should store this datum once, in a canonical type, The canonical type is whatever representation minimises transactionality loss
+
+\paragraph{Axiom 6: Virtuality}
+
+A virtual binding is code that transforms some part of the namespace according to a pure function
+
+$$ f(\mathit{name}, \mathit{namespace}) $$
+
+Virtual bindings are used to restore the infinite multiplicity of data representation, dynamically reprojecting the datum as query patterns demand. Virtual bindings can be used to replicate querying facilities like those given in any standard DBMS. For instance, sort keys should be implemented in this way (if they are not also the primary key (path)).
+
+\subsection{Commentary}
+
+
+\chapter{Types}
+
+\section{Background and Literature}
+\section{Internal Thinking}
+\section{Neo type model}
+
+Neo is a series of bindings from names to noun and rules for having those bindings evolve. However, we do not want to have to rewrite code for each kind of noun that we wish to store. Hence we introduce the notion of a protocol. A protocol is a kind of noun that constrains a noun. It is simply a type that exists in the namespace. We give these types special names, that map to a regular name in the namespace. The outputs of the build system must be special cased, in order to allow for bootstrapping.
+
+\lstset{language=Hoon}
+\begin{lstlisting}
+  $
+  |%
+  ::  $stud: Identifier for a build system output
+  +$  stud
+    $@  term
+    (pair mark (pair ship desk))
+  ::  $tack: Type of code being distributed
+  ::
+  ::    %con: CONverter of protocols
+  ::    %imp: IMPlemenation of shrub
+  ::    %pro: PROtocol (type)
+  ::
+  +$  tack
+    ?(%con %imp %pro %rol)
+  ::  $post: Name of code being distributed
+  ::
+  +$  post  (pair tack stud)
+  --
+
+\end{lstlisting}
+
+\subsection{Conversions}
+
+For any given protocol, there may be other protocols that are semantically equivalent. This is a 'conversion', a stateless transform from one protocol to another. This is the \%con case of \$tack. Data loss is acceptable, but if so, the reverse of the transform should not be defined i.e. if you have to leave a field blank, then transform is not valid.
+
+\paragraph{Polymorphism}
+
+Implementing these conversions allows for a limited kind of polymorphism, akin to rust's traits. Consider, for instance, a \$message protocol that contained the barest possible information (pair ship time). This is not particularly useful, because it does not have any contents field, but it does provide the necessary items that a chat needs from it's message children. So, if a chat declares it's children to be of protocol \%message, then we allow polymorphism over the children, such that the actual protocol can be anything that has a conversion defined to \%message. When constructing the context for a shrub, we include the children, but if they are polymorphised, then we run them through the conversion to monomorphise them before the shrub receives it. NB: we only polymorphise over state, not pokes.
+
+\subsection{Roles}
+
+A \$role is just another piece of "code", but this time in English. It corresponds to the \%rol case of \$tack. It contains an English language description of the semantic quality of a datatype. For instance, some easy roles to think about are \%sender and \%receiver. We now allow a conversion to decorate itself with an optional \$role. If a role is present in a conversion, then we no longer require that the conversion is semantically equivalent. The purpose of the role system is to allow querying by semantic quality, regardless of the underlying datatype, so long as the shrubs being queried understand the role.
+
+\begin{lstlisting}
+:: A conversion of role %currency-receiver is valid if the shrub is describing a transaction of monetary value.
+:: A conversion of role %currency-receiver should produce a type that describes the place where the transaction was sent.
+\end{lstlisting}
+
+The role system allows for projecting types in a way that combines the best of aspect-oriented programming with EAV-style databases. For instance, the query 'show me every transaction where I received money' can be trivially constructed, even if there are a mixture of cryptocurrency and fiat wallets inside the namespace.
+
+
+\chapter{Application Model}
 
 \section{Background and Literature}
 
-Exposite the relevant background and literature.
+Application development environments can be split into two different kinds. The application environments that must be compiled into the C ABI, and those that don't. The majority of application enviroments in use are of the former type, the only exception to this is Javascript. As Urbit is, amongst other things, an attempt to break from the restrictive constraints of the C ABI, we are most interested in the latter. The most well known examples of such are:
 
 \begin{enumerate}
-  \item  Prefer to \texttt{enumerate}.
-  \item  It is easier to refer to than \texttt{itemize}.
+  \item Haiku
+  \item Smalltalk
+  \item The various Lisp Machine OSs
+  \item Emacs
+  \item Hypercard
 \end{enumerate}
 
-\noindent
-Mark \texttt{\textbackslash noindent} in paragraphs that continue the thought of an \texttt{\textbackslash enumerate} block.
+Interestingly, all of these examples converged on using objects as the total organising primitive of the environment, even for those with traditionally more functional heritage (the lisps).
 
-\section{Urbit's Implementation}
+\subsection{They're just names, Leon}
 
-Oftentimes you will then turn to exploring how Urbit or closely related systems like Nockchain have approached or considered a problem.  You can look at a PR like \citetpr{urbit_urbit_6891}.
+\epigraph{I'm sorry that I long ago coined the term "objects" for this topic because it gets many people to focus on the lesser idea. The big idea is "messaging".}{Alan Kay}
 
-\lstset{language=C}
-\begin{lstlisting}
-#include <stdio.h>
+Regardless of the actual implementation, all OO systems provide two things. Names, and passing messages to those names. Implicit in the idea of names is the classic OOP notion of 'encapsulation'. Note that under this conception of object-orientation, Unix and Plan 9's concept of 'everything is a file' begins to look suspiciously like object-orientation. Once
 
-double compute(float a, float b) {
-    return a * a + b * b;
-}
+The reason that these environments coalesce around the idea of an 'object'
 
-int main() {
-    float x = 2.5;
-    float y = 3.7;
-
-    double result = compute(x, y);
-
-    printf("Result: %lf\n", result);
-
-    return 0;
-}
-\end{lstlisting}
-
-\noindent
-That code snippet was part of the text, and not a standalone entity to which we make separate repeated reference.
-
-\begin{figure}
-  \begin{lstlisting}[language=Python, caption={Example Python Code}, label={lst:example}]
-  def hello_world():
-      print("Hello, world!")
-  \end{lstlisting}
-\end{figure}
-
-Refer to the code listing: Listing~\ref{lst:example}.  (Note that we don't suppress indentation since it's a float.)
+\section{Internal Discussion}
 
 
-\section{A Wild Ernest Appears}
+\chapter{Conclusion}
 
-You can have as many sections as make sense.  Only sections and subsections appear in the table of contents.
 
-\section{Conclusion}
+Exposite the relevant background and literature.
 
-To summarize, why did you write it?  Why do we care?  What impact should it have on Urbit development?
-
-Your bibliography is a separate BibTeX file.  We use the \texttt{plainnat} bibliography style.  You can use \texttt{natbib} citation commands like \texttt{\textbackslash citep\{wikipedia\}} for parenthesized references.  Use \texttt{\textbackslash citet\{wikipedia\}} for inline references.  You can also use \texttt{\textbackslash citeauthor\{wikipedia\}} for the principal author's name.
-
-``You can use traditional TeX---or LaTeX---representations'' \citep{Varney1987}.
-
-“Or you can use fancy quotes—and symbols.”
 
 \printbibliography
 \end{document}
